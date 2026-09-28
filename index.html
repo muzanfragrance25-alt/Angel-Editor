@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Angel Editor</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="logo">◇</span><b>angel</b><span class="divider">/</span><span id="projectName">Untitled project</span></div>
+    <div class="top-actions">
+      <button id="newProjectBtn" class="ghost">New</button>
+      <button id="saveProjectBtn" class="ghost">Save Project</button>
+      <button id="exportBtn" class="primary">Export</button>
+    </div>
+  </header>
+
+  <main class="app">
+    <aside class="left">
+      <div class="tabs">
+        <button class="tab active" data-panel="media">▧ <span>Media</span></button>
+        <button class="tab" data-panel="audio">◖ <span>Audio</span></button>
+        <button class="tab" data-panel="titles">T <span>Titles</span></button>
+        <button class="tab" data-panel="transitions">◇ <span>Transitions</span></button>
+        <button class="tab" data-panel="effects">✣ <span>Effects</span></button>
+      </div>
+
+      <section id="panel-media" class="panel active">
+        <div class="panel-title">PROJECT BIN <button id="importBtn" class="icon-btn">＋</button></div>
+        <input id="fileInput" type="file" accept="video/*,audio/*,image/*" multiple hidden />
+        <button id="importCard" class="import-card">
+          <strong>＋</strong><span>Import media</span><small>Files stay on this device</small>
+        </button>
+        <div id="mediaList" class="media-list"></div>
+        <div class="privacy">✦ Local-first<br><small>Your footage stays in this browser.</small></div>
+      </section>
+
+      <section id="panel-audio" class="panel">
+        <div class="panel-title">AUDIO</div>
+        <p class="muted">Import an audio file from the Media tab, then add it to the timeline.</p>
+      </section>
+
+      <section id="panel-titles" class="panel">
+        <div class="panel-title">TITLES</div>
+        <button id="addTextBtn" class="wide">＋ Add text layer</button>
+        <p class="muted">Select a text layer to edit it in the Inspector.</p>
+      </section>
+
+      <section id="panel-transitions" class="panel">
+        <div class="panel-title">TRANSITIONS</div>
+        <div class="preset-grid">
+          <button data-transition="fade">Fade</button>
+          <button data-transition="dissolve">Dissolve</button>
+          <button data-transition="slide">Slide</button>
+          <button data-transition="zoom">Zoom</button>
+        </div>
+        <p class="muted">Transitions are applied between adjacent video clips in the timeline.</p>
+      </section>
+
+      <section id="panel-effects" class="panel">
+        <div class="panel-title">EFFECTS</div>
+        <div class="preset-grid">
+          <button data-effect="none">None</button>
+          <button data-effect="cinematic">Cinematic</button>
+          <button data-effect="bw">B&W</button>
+          <button data-effect="dreamy">Dreamy</button>
+          <button data-effect="vintage">Vintage</button>
+          <button data-effect="glow">Glow</button>
+        </div>
+        <p class="muted">Select a video clip first, then choose an effect.</p>
+      </section>
+    </aside>
+
+    <section class="workspace">
+      <div class="preview-head"><span class="dot"></span> PREVIEW <span id="previewStatus">EMPTY</span></div>
+      <div class="preview-wrap">
+        <canvas id="previewCanvas" width="1280" height="720"></canvas>
+        <div id="emptyPreview" class="empty">
+          <div class="empty-icon">↻</div>
+          <b>Your canvas is ready</b>
+          <span>Import a clip and add it to your timeline</span>
+        </div>
+        <div id="timeBadge" class="time-badge">00:00.00</div>
+      </div>
+      <div class="transport">
+        <button id="prevBtn">⏮</button><button id="playBtn" class="play">▶</button><button id="nextBtn">⏭</button>
+        <span id="currentTime">00:00.00</span><span class="slash">/</span><span id="durationTime">00:00.00</span>
+        <input id="seek" type="range" min="0" max="0" value="0" step="0.01" />
+      </div>
+    </section>
+
+    <aside class="inspector">
+      <div class="panel-title">INSPECTOR</div>
+      <div id="inspectorEmpty" class="inspector-empty">Select a clip in the timeline to inspect and edit its properties.</div>
+      <div id="inspectorContent" hidden>
+        <label>Clip <input id="clipName" type="text" /></label>
+        <div class="section-label">TRIM</div>
+        <label>Start <input id="trimStart" type="number" min="0" step="0.01" /></label>
+        <label>End <input id="trimEnd" type="number" min="0" step="0.01" /></label>
+        <label>Speed
+          <select id="speed">
+            <option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option>
+            <option value="1.5">1.5×</option><option value="2">2×</option><option value="4">4×</option>
+          </select>
+        </label>
+        <div class="section-label">TRANSFORM</div>
+        <label>Scale <input id="scale" type="number" min="0.1" max="4" step="0.05" /></label>
+        <label>Rotation <input id="rotation" type="number" min="-360" max="360" step="1" /></label>
+        <label>Opacity <input id="opacity" type="number" min="0" max="1" step="0.05" /></label>
+        <div class="section-label">AUDIO</div>
+        <label>Volume <input id="volume" type="range" min="0" max="1" step="0.01" /></label>
+        <button id="splitBtn" class="wide">✂ Split at playhead</button>
+        <button id="deleteBtn" class="danger wide">Delete clip</button>
+      </div>
+    </aside>
+  </main>
+
+  <section class="timeline-shell">
+    <div class="timeline-toolbar">
+      <span>EDIT TIMELINE</span>
+      <button id="zoomOut">−</button><span id="zoomLabel">100%</span><button id="zoomIn">＋</button>
+    </div>
+    <div id="timeline" class="timeline">
+      <div class="ruler" id="ruler"></div>
+      <div class="track"><div class="track-name">V1</div><div id="videoTrack" class="track-lane"></div></div>
+      <div class="track"><div class="track-name">A1</div><div id="audioTrack" class="track-lane"></div></div>
+      <div class="playhead" id="playhead"></div>
+    </div>
+  </section>
+
+  <div id="toast" class="toast"></div>
+  <div id="exportModal" class="modal" hidden>
+    <div class="modal-card">
+      <h2>Export video</h2>
+      <p>Angel Editor will render your current timeline locally in this browser.</p>
+      <label>Quality
+        <select id="exportQuality"><option value="720">720p</option><option value="1080" selected>1080p</option></select>
+      </label>
+      <button id="startExport" class="primary wide">Start Export</button>
+      <button id="cancelExport" class="ghost wide">Cancel</button>
+      <div id="exportProgress" hidden><div class="progress"><div id="progressBar"></div></div><small id="progressText">Preparing…</small></div>
+    </div>
+  </div>
+
+  <video id="sourceVideo" playsinline muted hidden></video>
+  <script src="app.js"></script>
+</body>
+</html>
